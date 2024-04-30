@@ -6,9 +6,6 @@ namespace DevFreela.API.Controllers
     [Route("api/skills")]
     public class SkillsController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+      
     }
 }
