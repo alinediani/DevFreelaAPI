@@ -8,18 +8,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 builder.Services.AddControllers();
 builder.Services.Configure<OpeningTimeOption>(configuration.GetSection("OpeningTime"));
-builder.Services.AddSingleton<DevFreelaDbContext>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
-//builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
+
+builder.Services.AddDbContext<DevFreelaDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DevFreelaConnection")));
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -27,8 +26,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-builder.Services.AddDbContext<DevFreelaDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DevFreelaConnection")));
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -37,11 +35,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
-app.MapControllers(); 
+app.MapControllers();
 
 app.Run();
+
