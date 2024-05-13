@@ -28,7 +28,7 @@ namespace DevFreela.Application.Services.Implementations
         public void CreateComment(CreateCommentInputModel inputModel)
         {
             var comment = new ProjectComment(inputModel.Comment, inputModel.IdProject, inputModel.IdUser);
-            _dbContext.Comments.Add(comment);
+            _dbContext.ProjectComments.Add(comment);
         }
 
         public void Delete(int id)
@@ -57,7 +57,7 @@ namespace DevFreela.Application.Services.Implementations
                 project.Id,
                 project.Title,
                 project.Description,
-                project.TotalCoast,
+                project.TotalCost,
                 project.StartedAt,
                 project.FinishedAt
                 );

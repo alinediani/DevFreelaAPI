@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -24,7 +27,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
+builder.Services.AddDbContext<DevFreelaDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DevFreelaConnection")));
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
