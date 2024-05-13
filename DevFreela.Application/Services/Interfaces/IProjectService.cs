@@ -2,9 +2,7 @@
 using DevFreela.Application.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DevFreela.Application.Services.Interfaces
 {
@@ -14,8 +12,8 @@ namespace DevFreela.Application.Services.Interfaces
         ProjectDetailsViewModel GetById(int id);
         int Create(NewProjectInputModel inputModel);
         void Update(UpdateProjectInputModel inputModel);
-        void CreateComment(CreateCommentInputModel inputModel);
         void Delete(int id);
+        void CreateComment(CreateCommentInputModel inputModel);
         void Start(int id);
         void Finish(int id);
     }
