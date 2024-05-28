@@ -1,44 +1,55 @@
+using DevFreela.Application.Commands.CreateProject;
 using DevFreela.Infrastructure.Persistence;
-using DevFreela.Application.Services.Implementations;
-using DevFreela.Application.Services.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
+using FluentValidation.AspNetCore;
+using DevFreela.API.Filters;
+using DevFreela.Application.Validators;
 
-var builder = WebApplication.CreateBuilder(args);
-var configuration = builder.Configuration;
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureWebHostDefaults(webBuilder =>
+    {
+        webBuilder.ConfigureServices(services =>
+        {
+            var connectionString = services.BuildServiceProvider().GetRequiredService<IConfiguration>().GetConnectionString("DevFreelaConnection");
+            services.AddDbContext<DevFreelaDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddControllers();
-builder.Services.Configure<OpeningTimeOption>(configuration.GetSection("OpeningTime"));
-builder.Services.AddScoped<IProjectService, ProjectService>();
-builder.Services.AddScoped<ISkillService, SkillService>();
+            services.AddControllers(options => options.Filters.Add(typeof(ValidationFilter)))
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateUserCommandValidator>());
+            services.AddMediatR(cfg => { cfg.RegisterServicesFromAssemblies(typeof(CreateProjectCommand).Assembly); });
 
-builder.Services.AddDbContext<DevFreelaDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DevFreelaConnection")));
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DevFreela.API", Version = "v1" });
+            });
+        })
+        .Configure(app =>
+        {
+            var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "DevFreela.API", Version = "v1" });
-});
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DevFreela.API v1"));
+            }
 
-var app = builder.Build();
+            app.UseHttpsRedirection();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        });
+    })
+    .Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DevFreela.API v1"));
-}
+await host.RunAsync();
 
-app.UseHttpsRedirection();
-app.UseRouting();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
 

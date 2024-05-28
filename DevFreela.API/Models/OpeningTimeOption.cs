@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace DevFreela.API.Models
 {
-    public class UpdateProjectModel
+    public class OpeningTimeOption
     {
-        public string Description { get; set; }
+        public TimeSpan StartAt { get; set; }
+        public TimeSpan FinishAt { get; set; }
     }
 }

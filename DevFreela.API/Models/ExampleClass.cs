@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace DevFreela.API.Models
 {
-    public class UpdateProjectModel
+    public class ExampleClass
     {
-        public string Description { get; set; }
+        public string Name { get; set; }
     }
 }
