@@ -10,6 +10,10 @@ using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using DevFreela.API.Filters;
 using DevFreela.Application.Validators;
+using DevFreela.Core.Services;
+using DevFreela.Infrastructure.Auth;
+using DevFreela.Core.Repositories;
+using DevFreela.Infrastructure.Persistence.Repositories;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureWebHostDefaults(webBuilder =>
@@ -18,6 +22,10 @@ var host = Host.CreateDefaultBuilder(args)
         {
             var connectionString = services.BuildServiceProvider().GetRequiredService<IConfiguration>().GetConnectionString("DevFreelaConnection");
             services.AddDbContext<DevFreelaDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ISkillRepository, SkillRepository>();
 
             services.AddControllers(options => options.Filters.Add(typeof(ValidationFilter)))
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CreateUserCommandValidator>());
